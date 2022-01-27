@@ -5,7 +5,7 @@
 
 之前的 eduroam-test.cgi 是shell脚本，存在安全问题。
 
-这里用C重写了，下载代码后，执行 make 生成 eduroam-test.cgi，功能与之前的完全一样，放在/var/www/cgi-bin目录下即可。
+这里用C重写了，下载代码后，修改 eduroam-test.c 最上面的raidus 服务器IP和密码，然后执行 make 生成 eduroam-test.cgi，功能与之前的完全一样，放在/var/www/cgi-bin目录下即可。
 
 
 感谢：
