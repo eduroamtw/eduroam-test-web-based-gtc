@@ -1,4 +1,18 @@
 # eduroam-test-web-based
+
+
+注意：
+
+之前的 eduroam-test.cgi 是shell脚本，存在安全问题。
+
+这里用C重写了，下载代码后，执行 make 生成 eduroam-test.cgi，功能与之前的完全一样，放在/var/www/cgi-bin目录下即可。
+
+
+感谢：
+
+使用了 https://github.com/ndevilla/dict https://github.com/ndevilla/tcgi
+
+
 Code for eduroam test via web based service
 
 It is a service which emulates user connecting to the access point connected to the eduroam (http://eduroam.org) infrastructure. You can use your test accounts to test wheter your users will be able to authenticate with eduroam outside your institution.
