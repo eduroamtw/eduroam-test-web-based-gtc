@@ -7,10 +7,31 @@
 
 这里用C重写了，下载代码后，修改 eduroam-test.c 最上面的raidus 服务器IP和密码，然后执行 make 生成 eduroam-test.cgi，功能与之前的完全一样，放在/var/www/cgi-bin目录下即可。
 
-
 感谢：
 
 使用了 https://github.com/ndevilla/dict https://github.com/ndevilla/tcgi
+
+# eduroam.ustc.edu.cn 安装过程
+
+```
+yum install openssl-devel  libnl-devel perl-libwww-perl.noarch
+
+cd /usr/src
+wget https://w1.fi/releases/wpa_supplicant-2.6.tar.gz
+tar zxf wpa_supplicant-2.6.tar.gz
+cd wpa_supplicant-2.6/wpa_supplicant
+cp defconfig .config
+
+vi .config
+找到
+#CONFIG_EAPOL_TEST=y
+修改为
+CONFIG_EAPOL_TEST=y
+
+make eapol_test
+
+cp eapol_test /usr/local/bin
+```
 
 
 Code for eduroam test via web based service
