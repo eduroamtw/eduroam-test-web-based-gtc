@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
 		"eap=TTLS\n"
 		"identity=\"%s\"\n"
 		"anonymous_identity=\"%s\"\n"
-		"password=\"%s\"\n" "phase2=\"aut=PAP\"\n" "}", login, login, pass);
+		"password=\"%s\"\n" "phase2=\"auth=PAP\"\n" "}", login, login, pass);
 
 	fclose(fp);
 
