@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "tcgi.h"
 
@@ -8,6 +9,42 @@
 #define CLIENT_SECRET "testing123"
 
 #define MAXLEN 4096
+#define CNTPER10MIN 30
+
+void check_rate(void)
+{
+	char fname[200];
+	time_t t;
+	struct tm *ctm;
+	time(&t);
+	ctm = localtime(&t);
+	sprintf(fname, "/dev/shm/%04d.%02d.%02d.%02d%02d",
+		ctm->tm_year + 1900, ctm->tm_mon + 1, ctm->tm_mday, ctm->tm_hour,
+		ctm->tm_min / 10 * 10);
+	FILE *fp;
+	fp = fopen(fname, "r+");
+	if (fp == NULL) {
+		fp = fopen(fname, "w");
+		fprintf(fp, "1");
+		fclose(fp);
+		return;
+	}
+
+	char buf[100];
+	int n;
+	buf[0] = 0;
+	fgets(buf, 10, fp);
+	n = atoi(buf);
+	if (n > CNTPER10MIN) {
+		fclose(fp);
+		sleep(4);
+		printf("每10分钟允许%d个请求，请稍后再来测试", CNTPER10MIN);
+		exit(0);
+	}
+	rewind(fp);
+	fprintf(fp, "%d", n + 1);
+	fclose(fp);
+}
 
 void check_login(char *login)
 {
@@ -52,6 +89,8 @@ int main(int argc, char *argv[])
 
 	printf("%s", "Content-Type: text/html\n\n");
 	printf("%s", "<html><head><title>eduroam test</title></head><body>");
+
+	check_rate();
 
 	if ((login == NULL) || (pass == NULL)) {
 		printf("%s", "<h2>eduroam test</h2>"
