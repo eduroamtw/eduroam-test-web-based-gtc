@@ -38,7 +38,7 @@ void check_rate(void)
 	if (n > CNTPER10MIN) {
 		fclose(fp);
 		sleep(4);
-		printf("每10分钟允许%d个请求，请稍后再来测试", CNTPER10MIN);
+		printf("%d tests are allowed every 10 minutes. Please try again later.", CNTPER10MIN);
 		exit(0);
 	}
 	rewind(fp);
@@ -88,14 +88,14 @@ int main(int argc, char *argv[])
 	pass = dict_get(cgid, "password", NULL);
 
 	printf("%s", "Content-Type: text/html\n\n");
-	printf("%s", "<html><head><title>eduroam test</title></head><body>");
+	printf("%s", "<html><head><title>eduroam Account Test Site</title></head><body>");
 
 	check_rate();
 
 	if ((login == NULL) || (pass == NULL)) {
-		printf("%s", "<h2>eduroam test</h2>"
+		printf("%s", "<h2>eduroam Account Test Site</h2>"
 		       "<p>Provide just <b>TEST</b> credentials, do not entry credentials of real accounts.</p>"
-		       "<p>Test tries EAP-PEAP MSCHAPv2 and EAP-TTLS PAP authentication.</p>"
+		       "<p>Test tries EAP-PEAP MSCHAPv2, EAP-TTLS PAP and EAP-PEAP GTC authentication.</p>"
 		       "<p>No results and login/passwords are stored.</p>"
 		       "<form action=/cgi-bin/eduroam-test.cgi method=GET>"
 		       "Login: <input type=text name=login><br>"
@@ -110,9 +110,10 @@ int main(int argc, char *argv[])
 	check_pass(pass);
 
 	printf("%s", "<a href=#mschapv2>EAP-PEAP MSCHAPv2 results</a><br>");
+	printf("%s", "<a href=#gtc>EAP-PEAP GTC results</a><br>");
 	printf("%s", "<a href=#pap>EAP-TTLS PAP results</a><br>");
 
-	// step 1: EAP-PEAR MSCHAPv2 test
+	// step 1: EAP-PEAP MSCHAPv2 test
 	printf("<a id=mschapv2><h2>Testing EAP-PEAP MSCHAPv2</h2></a>");
 	sprintf(filename, "/dev/shm/radcfg.%d.conf", getpid());
 	sprintf(filename_out, "/dev/shm/radtest.%d.out", getpid());
@@ -170,12 +171,72 @@ int main(int argc, char *argv[])
 	unlink(filename);
 	unlink(filename_out);
 
-	// step 2: EAP-TLS PAP test
-	printf("<a id=pap><h2>Testing EAP-TLS PAP</h2></a>");
+	// step 2: EAP-PEAP GTC test
+	printf("<a id=gtc><h2>Testing EAP-PEAP GTC</h2></a>");
 	sprintf(filename, "/dev/shm/radcfg.%d.conf", getpid());
 	sprintf(filename_out, "/dev/shm/radtest.%d.out", getpid());
 
 	// step 2.1: write config file
+	fp = fopen(filename, "w");
+	if (fp == NULL) {
+		printf("open file %s error", filename);
+		exit(0);
+	}
+	fprintf(fp, "network={\n"
+		"ssid=\"eduroam\"\n"
+		"key_mgmt=WPA-EAP\n"
+		"eap=PEAP\n"
+		"identity=\"%s\"\n"
+		"anonymous_identity=\"%s\"\n"
+		"password=\"%s\"\n"
+		"phase2=\"auth=GTC\"\n"
+		"phase1=\"peapver=0\"\n" "}", login, login, pass);
+
+	fclose(fp);
+
+	// step 2.2: show config file
+	printf("%s", "<h3>Configuration file used</h3>");
+	printf("<pre>\n");
+	fp = fopen(filename, "r");
+	if (fp == NULL) {
+		printf("open file %s error", filename);
+		exit(0);
+	}
+	while (fgets(buf, MAXLEN, fp))
+		printf("%s", buf);
+	fclose(fp);
+	printf("%s", "</pre>\n");
+
+	// step 2.3: do the test
+	sprintf(buf, "/usr/local/bin/eapol_test -c %s -s %s -a %s 2>&1 > %s",
+		filename, CLIENT_SECRET, RADIUS_SERVER, filename_out);
+	ret = system(buf);
+	if (ret != 0)
+		res = "<span style=\"color: red;\">FAILURE</span>";
+	else
+		res = "<span style=\"color: green;\">OK</span>";
+
+	// step 2.4: show the result
+	printf("<h3>Results of the test: %s</h3>", res);
+	printf("%s", "<pre>\n");
+	fp = fopen(filename_out, "r");
+	if (fp == NULL) {
+		printf("open file %s error", filename_out);
+		exit(0);
+	}
+	while (fgets(buf, MAXLEN, fp))
+		printf("%s", buf);
+	fclose(fp);
+	printf("%s", "</pre>\n");
+	unlink(filename);
+	unlink(filename_out);
+
+	// step 3: EAP-TTLS PAP test
+	printf("<a id=pap><h2>Testing EAP-TLS PAP</h2></a>");
+	sprintf(filename, "/dev/shm/radcfg.%d.conf", getpid());
+	sprintf(filename_out, "/dev/shm/radtest.%d.out", getpid());
+
+	// step 3.1: write config file
 	fp = fopen(filename, "w");
 	if (fp == NULL) {
 		printf("open file %s error", filename);
@@ -191,7 +252,7 @@ int main(int argc, char *argv[])
 
 	fclose(fp);
 
-	// step 2.2: show config file
+	// step 3.2: show config file
 	printf("%s", "<h3>Configuration file used</h3>");
 
 	printf("<pre>\n");
@@ -207,7 +268,7 @@ int main(int argc, char *argv[])
 	fclose(fp);
 	printf("%s", "</pre>\n");
 
-	// step 2.3: do the test
+	// step 3.3: do the test
 	sprintf(buf, "/usr/local/bin/eapol_test -c %s -s %s -a %s 2>&1 > %s",
 		filename, CLIENT_SECRET, RADIUS_SERVER, filename_out);
 
@@ -217,7 +278,7 @@ int main(int argc, char *argv[])
 	else
 		res = "<span style=\"color: green;\">OK</span>";
 
-	// step 2.4: show the result
+	// step 3.4: show the result
 	printf("<h3>Results of the test: %s</h3>", res);
 	printf("%s", "<pre>\n");
 	fp = fopen(filename_out, "r");
