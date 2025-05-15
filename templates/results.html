@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>eduroam test results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="mt-4">Test Results for {{ login }}</h1>
+      
+      <div class="my-4">
+        <a href="#mschapv2">EAP-PEAP MSCHAPv2 results</a><br>
+        <a href="#pap">EAP-TTLS PAP results</a>
+      </div>
+
+      <!-- MSCHAPv2 Results -->
+      <div id="mschapv2" class="test-section mb-4">
+        <h2>Testing EAP-PEAP MSCHAPv2</h2>
+        <h3>Configuration file used:</h3>
+        <pre class="bg-light p-3">{{ results.mschapv2.config }}</pre>
+        
+        <h3>Results of the test: 
+          <span class="{% if results.mschapv2.success %}text-success{% else %}text-danger{% endif %}">
+            {{ 'SUCCESS' if results.mschapv2.success else 'FAILURE' }}
+          </span>
+        </h3>
+        <pre class="bg-light p-3">{{ results.mschapv2.output }}</pre>
+      </div>
+
+      <!-- PAP Results -->
+      <div id="pap" class="test-section mb-4">
+        <h2>Testing EAP-TTLS PAP</h2>
+        <h3>Configuration file used:</h3>
+        <pre class="bg-light p-3">{{ results.pap.config }}</pre>
+        
+        <h3>Results of the test: 
+          <span class="{% if results.pap.success %}text-success{% else %}text-danger{% endif %}">
+            {{ 'SUCCESS' if results.pap.success else 'FAILURE' }}
+          </span>
+        </h3>
+        <pre class="bg-light p-3">{{ results.pap.output }}</pre>
+      </div>
+
+      <a href="{{ url_for('index') }}" class="btn btn-primary mb-4">Test Another Account</a>
+    </div>
+
+    <footer class="footer mt-auto py-3 bg-light">
+      <div class="container text-center">
+        <p class="text-muted">Supported by <a href="http://www.cesnet.cz">CESNET</a> and <a href="http://www.chain-project.eu">CHAIN-REDS</a> project</p>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

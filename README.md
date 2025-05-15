@@ -1,15 +1,13 @@
-# eduroam-test-web-based
+# eduroam-test-web-based (Python Version)
 
+A Python Flask web application for testing eduroam RADIUS configurations. This service emulates a user connecting to an access point connected to the eduroam infrastructure. You can use test accounts to verify whether your users will be able to authenticate with eduroam outside your institution.
 
-注意：
+## Requirements
 
-之前的 eduroam-test.cgi 是shell脚本，存在安全问题。
-
-这里用C重写了，下载代码后，修改 eduroam-test.c 最上面的raidus 服务器IP和密码，然后执行 make 生成 eduroam-test.cgi，功能与之前的完全一样，放在/var/www/cgi-bin目录下即可。
-
-感谢：
-
-使用了 https://github.com/ndevilla/dict https://github.com/ndevilla/tcgi
+* Python 3.8 or higher
+* Flask web framework
+* `eapol_test` utility (from wpa_supplicant)
+* A local RADIUS server connected to eduroam
 
 # eduroam.ustc.edu.cn 安装过程
 
