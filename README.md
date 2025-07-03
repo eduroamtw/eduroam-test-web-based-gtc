@@ -9,6 +9,10 @@ A Python Flask web application for testing eduroam RADIUS configurations. This s
 * `eapol_test` utility (from wpa_supplicant)
 * A local RADIUS server connected to eduroam
 
+```
+flask run --host=0.0.0.0 --port 8080
+```
+
 # eduroam.ustc.edu.cn 安装过程
 
 ```
