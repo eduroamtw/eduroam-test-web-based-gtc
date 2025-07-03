@@ -83,14 +83,21 @@ def test_eduroam_config(login, password, auth_type='mschapv2'):
         
         result = subprocess.run(cmd, capture_output=True, text=True)
         
+        # Filter out the first line (Reading configuration file...)
+        output_lines = (result.stdout + result.stderr).split('\n')
+        if output_lines and output_lines[0].startswith('Reading configuration file'):
+            filtered_output = '\n'.join(output_lines[1:])
+        else:
+            filtered_output = result.stdout + result.stderr
+        
         with open(output_path, 'w') as f:
-            f.write(result.stdout + result.stderr)
+            f.write(filtered_output)
             
         success = result.returncode == 0
         return {
             'success': success,
             'config': config,
-            'output': result.stdout + result.stderr
+            'output': filtered_output
         }
             
     finally:
