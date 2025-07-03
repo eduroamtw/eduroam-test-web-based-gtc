@@ -46,7 +46,7 @@ def check_rate():
 def validate_input(text, input_type='login'):
     """Validate input strings"""
     if input_type == 'login':
-        pattern = r'^[0-9a-zA-Z@._-]+$'
+        pattern = r'^[0-9a-zA-Z@%._-]+$'
     else:  # password
         pattern = r'^[0-9a-zA-Z@.~!@#$%^&*()_+=\{\}\[\];:\',.?/\\-]+$'
     
